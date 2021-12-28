@@ -23,12 +23,12 @@ class Competition:
         competitions_ul_xpath=settings.COMPETITIONS_UL_XPATH,
     ):
         self.url = url
-        self.current_page = 0
         self.paginator_xpath = paginator_xpath
         self.competitions_div_xpath = competitions_div_xpath
         self.competitions_ul_xpath = competitions_ul_xpath
-        self.player_data = []
+        self.current_page = 0
         self.current_competition = 0
+        self.player_data = []
         self.webdriver = utils.init_webdriver()
         self._accept_cookies()
 
@@ -57,12 +57,13 @@ class Competition:
                     return table
 
     def get_player_urls(self):
+        self.current_page = 0
         while table := self._load_next_players_table():
             soup = BeautifulSoup(table.get_attribute('outerHTML'), 'html.parser')
             for tr in soup.tbody.find_all('tr'):
                 yield utils.build_url(tr.td.a['href'])
 
-    def load_next_competition(self):
+    def _load_next_competition(self):
         self.webdriver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
         actions = ActionChains(self.webdriver)
         competitions_div = self.webdriver.find_element_by_xpath(self.competitions_div_xpath)
@@ -91,7 +92,7 @@ class Competition:
                 break
 
     def get_competition_data(self, num_players=0):
-        while competition := self.load_next_competition():
+        while competition := self._load_next_competition():
             self.get_player_data(competition, num_players)
 
     def to_dataframe(self):
