@@ -8,11 +8,23 @@ PROJECT_NAME = PROJECT_DIR.name
 LALIGA_DATA_URL = config(
     'LALIGA_DATA_URL', default='https://www.laliga.com/en-ES/advanced-stats'
 )
+
 SELENIUM_HEADLESS = config('SELENIUM_HEADLESS', default=True, cast=lambda v: bool(int(v)))
+
 PAGINATOR_XPATH = config(
     'PAGINATOR_XPATH', default='//*[@id="__next"]/div[5]/div[4]/div/div/div'
 )
+COMPETITIONS_DIV_XPATH = config(
+    'COMPETITIONS_DIV_XPATH',
+    default='//*[@id="__next"]/div[5]/div[1]/div/div[2]/div/div[2]/div[1]/div',
+)
+COMPETITIONS_UL_XPATH = config(
+    'COMPETITIONS_UL_XPATH',
+    default='//*[@id="__next"]/div[5]/div[1]/div/div[2]/div/div[2]/div[1]/ul',
+)
 SCRIPT_DATA_ID = config('SCRIPT_DATA_ID', default='__NEXT_DATA__')
+DROPDOWN_OFFSET = config('DROPDOWN_OFFSET', default=30, cast=int)
+
 DF_OUTPUT_FILEPATH = config(
     'DF_OUTPUT_FILEPATH', default=PROJECT_DIR / (PROJECT_NAME + '.csv'), cast=Path
 )
