@@ -1,4 +1,5 @@
-from laliga.core import Scraper
+from laliga.competition import Competition
 
-scraper = Scraper()
-print(scraper.get_player_urls())
+comp = Competition()
+comp.get_player_data(10)
+comp.to_csv()

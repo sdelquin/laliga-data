@@ -1,6 +1,6 @@
 import time
-from urllib.parse import urljoin
 
+import pandas as pd
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,14 +8,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import settings
 from laliga import utils
+from laliga.player import Player
 
 
-class Scraper:
+class Competition:
     def __init__(
         self, url=settings.LALIGA_DATA_URL, paginator_xpath=settings.PAGINATOR_XPATH
     ):
         self.url = url
-        self.current_page = 1
+        self.current_page = 0
         self.paginator_xpath = paginator_xpath
         self.webdriver = utils.init_webdriver()
         self._accept_cookies()
@@ -32,7 +33,6 @@ class Scraper:
         time.sleep(1)
 
     def _load_next_players_table(self):
-        print(f'Page {self.current_page}')
         paginator = self.webdriver.find_element_by_xpath(self.paginator_xpath)
         for div in paginator.find_elements_by_tag_name('div'):
             page = div.text.strip()
@@ -46,10 +46,20 @@ class Scraper:
                     return table
 
     def get_player_urls(self):
-        players_urls = []
         while table := self._load_next_players_table():
             soup = BeautifulSoup(table.get_attribute('outerHTML'), 'html.parser')
             for tr in soup.tbody.find_all('tr'):
-                player_url = urljoin(self.url, tr.td.a['href'])
-                players_urls.append(player_url)
-        return players_urls
+                yield utils.build_url(tr.td.a['href'])
+
+    def get_player_data(self, num_players=0):
+        self.player_data = []
+        for player_no, player_url in enumerate(self.get_player_urls()):
+            print(player_url)
+            if player_no == num_players:
+                break
+            player = Player(player_url)
+            self.player_data.append(player.get_data())
+
+    def to_csv(self, output_filepath=settings.DF_OUTPUT_FILEPATH):
+        df = pd.DataFrame(self.player_data)
+        df.to_csv(output_filepath, index=False)
