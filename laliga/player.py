@@ -14,10 +14,14 @@ class Player:
 
     def _extract_properties(self):
         data = {}
+        # custom properties
         for target_key, source_keys in self.selected_properties.items():
             data[target_key] = utils.get_value_from_nested_keys(
                 self.source_properties, source_keys
             )
+        # player stats
+        for item in self.source_properties['playerStats']:
+            data[item['name']] = item['stat']
         return data
 
     def get_data(self):

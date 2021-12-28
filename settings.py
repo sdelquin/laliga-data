@@ -33,4 +33,13 @@ PLAYER_PROPS_SELECTION = {
     'twitter': ('player', 'twitter'),
     'instagram': ('player', 'instagram'),
     'country': ('player', 'country', 'id'),
+    'team': ('player', 'team', 'nickname'),
+    'team.shortname': ('player', 'team', 'shortname'),
+    'team.foundation': ('player', 'team', 'foundation'),
+    'team.shield': ('player', 'team', 'shield', 'resizes', 'medium'),
+    'shirt_number': ('player', 'squad', 'shirt_number'),
+    'position': ('player', 'squad', 'position', 'name'),
+    'photo': ('player', 'photos', '001', '512x556'),
+    'stadium': ('club', 'venue', 'name'),
+    'stadium.image': ('club', 'venue', 'image', 'resizes', 'medium'),
 }
