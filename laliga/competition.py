@@ -108,6 +108,8 @@ class Competition:
             if self.df[column].dtype == 'float64':
                 if all((self.df[column] / np.floor(self.df[column])).dropna() == 1):
                     self.df[column] = self.df[column].astype(pd.Int64Dtype())
+        # add URL to Twitter column
+        self.df['twitter'] = self.df['twitter'].str.replace('@', settings.TWITTER_BASE_URL)
 
     def to_csv(self, output_filepath=settings.DF_OUTPUT_FILEPATH):
         self.df.to_csv(output_filepath, index=False)

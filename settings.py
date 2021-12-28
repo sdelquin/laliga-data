@@ -31,6 +31,7 @@ DF_OUTPUT_FILEPATH = config(
 
 COMPETITION_COLUMN = config('COMPETITION_COLUMN', default='competition')
 PLAYER_URL_COLUMN = config('PLAYER_URL_COLUMN', default='player.url')
+TWITTER_BASE_URL = config('TWITTER_BASE_URL', default='https://twitter.com/')
 
 PLAYER_PROPS_SELECTION = {
     'id': ('player', 'id'),
