@@ -29,6 +29,9 @@ DF_OUTPUT_FILEPATH = config(
     'DF_OUTPUT_FILEPATH', default=PROJECT_DIR / (PROJECT_NAME + '.csv'), cast=Path
 )
 
+COMPETITION_COLUMN = config('COMPETITION_COLUMN', default='competition')
+PLAYER_URL_COLUMN = config('PLAYER_URL_COLUMN', default='player.url')
+
 PLAYER_PROPS_SELECTION = {
     'id': ('player', 'id'),
     'slug': ('player', 'slug'),

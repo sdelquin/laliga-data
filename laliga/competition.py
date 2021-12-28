@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.action_chains import ActionChains
@@ -83,7 +84,8 @@ class Competition:
             print(player_url)
             player = Player(player_url)
             data = player.get_data()
-            data['competition'] = competition
+            data[settings.COMPETITION_COLUMN] = competition
+            data[settings.PLAYER_URL_COLUMN] = player_url
             self.player_data.append(data)
             if i == num_players:
                 break
@@ -92,6 +94,20 @@ class Competition:
         while competition := self.load_next_competition():
             self.get_player_data(competition, num_players)
 
+    def to_dataframe(self):
+        self.df = pd.DataFrame(self.player_data)
+        # arrange these columns to the beginning
+        self.df.insert(
+            0, settings.PLAYER_URL_COLUMN, self.df.pop(settings.PLAYER_URL_COLUMN)
+        )
+        self.df.insert(
+            0, settings.COMPETITION_COLUMN, self.df.pop(settings.COMPETITION_COLUMN)
+        )
+        # convert float columns to integer (if proceed)
+        for column in self.df.columns:
+            if self.df[column].dtype == 'float64':
+                if all((self.df[column] / np.floor(self.df[column])).dropna() == 1):
+                    self.df[column] = self.df[column].astype(pd.Int64Dtype())
+
     def to_csv(self, output_filepath=settings.DF_OUTPUT_FILEPATH):
-        df = pd.DataFrame(self.player_data)
-        df.to_csv(output_filepath, index=False)
+        self.df.to_csv(output_filepath, index=False)
