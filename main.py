@@ -1,6 +1,6 @@
-from laliga.competition import Competition
+from laliga.core import LaLigaScraper
 
-comp = Competition()
-comp.get_competition_data()
-comp.to_dataframe()
-comp.to_csv()
+scraper = LaLigaScraper()
+scraper.get_player_data()
+scraper.to_dataframe()
+scraper.to_csv()

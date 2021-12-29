@@ -14,7 +14,7 @@ from laliga import utils
 from laliga.player import Player
 
 
-class Competition:
+class LaLigaScraper:
     def __init__(
         self,
         url=settings.LALIGA_DATA_URL,
@@ -80,7 +80,7 @@ class Competition:
         self.current_competition += 1
         return competition.text
 
-    def get_player_data(self, competition: str, num_players=0):
+    def get_player_data_by_competition(self, competition: str, num_players=0):
         for i, player_url in enumerate(self.get_player_urls(), start=1):
             print(player_url)
             player = Player(player_url)
@@ -91,9 +91,9 @@ class Competition:
             if i == num_players:
                 break
 
-    def get_competition_data(self, num_players=0):
+    def get_player_data(self, num_players=0):
         while competition := self._load_next_competition():
-            self.get_player_data(competition, num_players)
+            self.get_player_data_by_competition(competition, num_players)
 
     def to_dataframe(self):
         self.df = pd.DataFrame(self.player_data)
