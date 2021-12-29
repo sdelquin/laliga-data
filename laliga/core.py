@@ -1,6 +1,5 @@
 import time
 
-import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
 from logzero import logger
@@ -11,8 +10,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 import settings
-from laliga import utils
 from laliga.player import Player
+from laliga.utils import build_url, init_webdriver
+from laliga.wrangling import wrangle_dataframe
 
 
 class LaLigaScraper:
@@ -30,7 +30,7 @@ class LaLigaScraper:
         self.current_page = 0
         self.current_competition = 0
         self.player_data = []
-        self.webdriver = utils.init_webdriver()
+        self.webdriver = init_webdriver()
         self._accept_cookies()
 
     def __del__(self):
@@ -65,7 +65,7 @@ class LaLigaScraper:
             logger.debug(f'Getting player urls from table in page {self.current_page}')
             soup = BeautifulSoup(table.get_attribute('outerHTML'), 'html.parser')
             for tr in soup.tbody.find_all('tr'):
-                yield utils.build_url(tr.td.a['href'])
+                yield build_url(tr.td.a['href'])
 
     def _load_next_competition(self):
         self.webdriver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
@@ -102,15 +102,10 @@ class LaLigaScraper:
     def to_dataframe(self):
         logger.info('Converting player data to Pandas DataFrame')
         self.df = pd.DataFrame(self.player_data)
-        # convert float columns to integer (if proceed)
-        logger.debug('Converting non-decimal columns to Int64Dtype')
-        for column in self.df.columns:
-            if self.df[column].dtype == 'float64':
-                if all((self.df[column] / np.floor(self.df[column])).dropna() == 1):
-                    self.df[column] = self.df[column].astype(pd.Int64Dtype())
-        # add URL to Twitter column
-        logger.debug('Adding url to Twitter nicknames')
-        self.df['twitter'] = self.df['twitter'].str.replace('@', settings.TWITTER_BASE_URL)
+
+    def wrangle_dataframe(self):
+        logger.info('Wrangling player dataframe')
+        self.df = wrangle_dataframe(self.df)
 
     def to_csv(self, output_filepath=settings.DF_OUTPUT_FILEPATH):
         logger.info(f'Dumping player dataframe to {output_filepath}')
