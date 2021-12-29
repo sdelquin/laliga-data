@@ -41,7 +41,6 @@ def wrangle_dataframe(
     player_props_selection=settings.PLAYER_PROPS_SELECTION,
 ):
     last_prop_idx = df.columns.get_loc(list(player_props_selection.keys())[-1])
-    df = fill_na(df, last_prop_idx)
     df = cols_to_int64(df)
     df = fix_twitter_col(df, twitter_base_url)
     df = sort_stats_cols(df, last_prop_idx)
