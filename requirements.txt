@@ -7,3 +7,4 @@ requests
 prettyconf
 logzero
 typer
+user_agent

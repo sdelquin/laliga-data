@@ -37,6 +37,14 @@ LOGFILE = config('LOGFILE', default=PROJECT_DIR / (PROJECT_NAME + '.log'), cast=
 LOGFILE_SIZE = config('LOGFILE_SIZE', cast=float, default=1e6)
 LOGFILE_BACKUP_COUNT = config('LOGFILE_BACKUP_COUNT', cast=int, default=3)
 
+REQUESTS_TIMEOUT = config('REQUESTS_TIMEOUT', default=5, cast=int)  # seconds
+REQUESTS_DELAY = config('REQUESTS_DELAY', default=1, cast=int)  # seconds
+REQUESTS_RETRIES = config('REQUESTS_RETRIES', default=3, cast=int)
+
+SELENIUM_TIMEOUT = config('SELENIUM_TIMEOUT', default=30, cast=int)  # seconds
+SELENIUM_DELAY = config('SELENIUM_DELAY', default=1, cast=int)  # seconds
+SELENIUM_RETRIES = config('SELENIUM_RETRIES', default=3, cast=int)
+
 PLAYER_PROPS_SELECTION = {
     'id': ('player', 'id'),
     'slug': ('player', 'slug'),

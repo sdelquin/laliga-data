@@ -7,12 +7,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 import settings
-from laliga.player import Player
-from laliga.utils import build_url, init_webdriver
-from laliga.wrangling import wrangle_dataframe
+
+from . import network
+from .player import Player
+from .utils import build_url, init_webdriver
+from .wrangling import wrangle_dataframe
 
 
 class LaLigaScraper:
@@ -39,8 +40,9 @@ class LaLigaScraper:
     def _accept_cookies(self):
         logger.info(f'Moving to {self.url}')
         self.webdriver.get(self.url)
-        accept_cookies_btn = WebDriverWait(self.webdriver, 10).until(
-            EC.presence_of_element_located((By.ID, 'onetrust-accept-btn-handler'))
+        accept_cookies_btn = network.selenium_wait(
+            self.webdriver,
+            EC.presence_of_element_located((By.ID, 'onetrust-accept-btn-handler')),
         )
         logger.debug('Accepting cookies')
         accept_cookies_btn.click()
@@ -53,8 +55,9 @@ class LaLigaScraper:
             if page.isnumeric():
                 if int(page) == self.current_page + 1:
                     div.click()
-                    table = WebDriverWait(self.webdriver, 10).until(
-                        EC.presence_of_element_located((By.TAG_NAME, 'table'))
+                    table = network.selenium_wait(
+                        self.webdriver,
+                        EC.presence_of_element_located((By.TAG_NAME, 'table')),
                     )
                     self.current_page += 1
                     return table
@@ -87,13 +90,17 @@ class LaLigaScraper:
 
     def get_player_data_by_competition(self, competition: str, num_players=0):
         logger.info('Getting player data')
-        for player_no, player_url in enumerate(self.get_player_urls(), start=1):
-            logger.debug(f'[{player_no:03d}] {player_url}')
+        num_checked_players = 1
+        for player_url in self.get_player_urls():
+            logger.debug(f'[{num_checked_players:03d}] {player_url}')
             player = Player(player_url, competition)
-            data = player.get_data()
-            self.player_data.append(data)
-            if player_no == num_players:
-                break
+            if data := player.get_data():
+                self.player_data.append(data)
+                if num_checked_players == num_players:
+                    break
+                num_checked_players += 1
+            else:
+                logger.error('Unable to retrieve data')
 
     def get_player_data(self, num_players=0):
         while competition := self._load_next_competition():

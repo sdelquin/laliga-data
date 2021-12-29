@@ -1,10 +1,10 @@
 import json
 
-import requests
 from bs4 import BeautifulSoup
 
 import settings
-from laliga import utils
+
+from . import network, utils
 
 
 class Player:
@@ -32,13 +32,13 @@ class Player:
             self.data[item['name']] = item['stat']
 
     def get_data(self):
-        response = requests.get(self.url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        script_contents = soup.find('script', id=settings.SCRIPT_DATA_ID).string
-        source = json.loads(script_contents)
-        self.source_properties = source['props']['pageProps']
-        self._extract_properties()
-        return self.data
+        if response := network.make_request(self.url):
+            soup = BeautifulSoup(response.text, 'html.parser')
+            script_contents = soup.find('script', id=settings.SCRIPT_DATA_ID).string
+            source = json.loads(script_contents)
+            self.source_properties = source['props']['pageProps']
+            self._extract_properties()
+            return self.data
 
     def __str__(self):
         return self.data.get('name', self.url)
