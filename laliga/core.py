@@ -3,6 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
+from logzero import logger
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -36,10 +37,12 @@ class LaLigaScraper:
         self.webdriver.quit()
 
     def _accept_cookies(self):
+        logger.info(f'Moving to {self.url}')
         self.webdriver.get(self.url)
         accept_cookies_btn = WebDriverWait(self.webdriver, 10).until(
             EC.presence_of_element_located((By.ID, 'onetrust-accept-btn-handler'))
         )
+        logger.debug('Accepting cookies')
         accept_cookies_btn.click()
         time.sleep(1)
 
@@ -59,6 +62,7 @@ class LaLigaScraper:
     def get_player_urls(self):
         self.current_page = 0
         while table := self._load_next_players_table():
+            logger.debug(f'Getting player urls from table in page {self.current_page}')
             soup = BeautifulSoup(table.get_attribute('outerHTML'), 'html.parser')
             for tr in soup.tbody.find_all('tr'):
                 yield utils.build_url(tr.td.a['href'])
@@ -73,6 +77,7 @@ class LaLigaScraper:
         if self.current_competition >= len(competitions):
             return None
         competition = competitions[self.current_competition]
+        logger.info(f'Loading competition "{competition.text}"')
         actions.move_to_element(competitions_div)
         actions.move_by_offset(0, (self.current_competition + 1) * settings.DROPDOWN_OFFSET)
         actions.click()
@@ -81,14 +86,13 @@ class LaLigaScraper:
         return competition.text
 
     def get_player_data_by_competition(self, competition: str, num_players=0):
-        for i, player_url in enumerate(self.get_player_urls(), start=1):
-            print(player_url)
-            player = Player(player_url)
+        logger.info('Getting player data')
+        for player_no, player_url in enumerate(self.get_player_urls(), start=1):
+            logger.debug(f'[{player_no:03d}] {player_url}')
+            player = Player(player_url, competition)
             data = player.get_data()
-            data[settings.COMPETITION_COLUMN] = competition
-            data[settings.PLAYER_URL_COLUMN] = player_url
             self.player_data.append(data)
-            if i == num_players:
+            if player_no == num_players:
                 break
 
     def get_player_data(self, num_players=0):
@@ -96,21 +100,18 @@ class LaLigaScraper:
             self.get_player_data_by_competition(competition, num_players)
 
     def to_dataframe(self):
+        logger.info('Converting player data to Pandas DataFrame')
         self.df = pd.DataFrame(self.player_data)
-        # arrange these columns to the beginning
-        self.df.insert(
-            0, settings.PLAYER_URL_COLUMN, self.df.pop(settings.PLAYER_URL_COLUMN)
-        )
-        self.df.insert(
-            0, settings.COMPETITION_COLUMN, self.df.pop(settings.COMPETITION_COLUMN)
-        )
         # convert float columns to integer (if proceed)
+        logger.debug('Converting non-decimal columns to Int64Dtype')
         for column in self.df.columns:
             if self.df[column].dtype == 'float64':
                 if all((self.df[column] / np.floor(self.df[column])).dropna() == 1):
                     self.df[column] = self.df[column].astype(pd.Int64Dtype())
         # add URL to Twitter column
+        logger.debug('Adding url to Twitter nicknames')
         self.df['twitter'] = self.df['twitter'].str.replace('@', settings.TWITTER_BASE_URL)
 
     def to_csv(self, output_filepath=settings.DF_OUTPUT_FILEPATH):
+        logger.info(f'Dumping player dataframe to {output_filepath}')
         self.df.to_csv(output_filepath, index=False)

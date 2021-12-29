@@ -33,6 +33,10 @@ COMPETITION_COLUMN = config('COMPETITION_COLUMN', default='competition')
 PLAYER_URL_COLUMN = config('PLAYER_URL_COLUMN', default='player.url')
 TWITTER_BASE_URL = config('TWITTER_BASE_URL', default='https://twitter.com/')
 
+LOGFILE = config('LOGFILE', default=PROJECT_DIR / (PROJECT_NAME + '.log'), cast=Path)
+LOGFILE_SIZE = config('LOGFILE_SIZE', cast=float, default=1e6)
+LOGFILE_BACKUP_COUNT = config('LOGFILE_BACKUP_COUNT', cast=int, default=3)
+
 PLAYER_PROPS_SELECTION = {
     'id': ('player', 'id'),
     'slug': ('player', 'slug'),
