@@ -16,6 +16,10 @@ jobs:
         with:
           requirements: requirements.txt
       - run: python main.py -v
+        env:
+          PAGINATOR_XPATH: ${{ secrets.PAGINATOR_XPATH }}
+          COMPETITIONS_DIV_XPATH: ${{ secrets.COMPETITIONS_DIV_XPATH }}
+          COMPETITIONS_UL_XPATH: ${{ secrets.COMPETITIONS_UL_XPATH }}
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update dataset file
