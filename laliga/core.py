@@ -90,10 +90,6 @@ class LaLigaScraper:
     def _load_next_competition(self):
         self.webdriver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
         actions = ActionChains(self.webdriver)
-        self.webdriver.save_screenshot('capture.png')
-        import sys
-
-        sys.exit(0)
         competitions_div = self.webdriver.find_element_by_xpath(self.competitions_div_xpath)
         competitions_div.click()
         competitions_ul = self.webdriver.find_element_by_xpath(self.competitions_ul_xpath)
