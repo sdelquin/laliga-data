@@ -1,0 +1,21 @@
+name: CI
+on:
+  schedule:
+    - cron: "0 3 * * 2"
+  workflow_dispatch:
+jobs:
+  laliga-scraping:
+    name: Scrap laliga.com and generate csv dataset files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - uses: BSFishy/pip-action@v1
+        with:
+          requirements: requirements.txt
+      - run: python main.py -v
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update dataset file
