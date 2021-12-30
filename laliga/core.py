@@ -1,3 +1,4 @@
+import re
 import time
 
 import pandas as pd
@@ -19,20 +20,25 @@ from .wrangling import wrangle_dataframe
 class LaLigaScraper:
     def __init__(
         self,
-        url=settings.LALIGA_DATA_URL,
+        url=settings.LALIGA_ADV_STATS_URL,
         paginator_xpath=settings.PAGINATOR_XPATH,
         competitions_div_xpath=settings.COMPETITIONS_DIV_XPATH,
         competitions_ul_xpath=settings.COMPETITIONS_UL_XPATH,
+        output_filepath=settings.PLAYERS_FILEPATH,
+        stats_url=settings.LALIGA_STATS_URL,
     ):
         self.url = url
         self.paginator_xpath = paginator_xpath
         self.competitions_div_xpath = competitions_div_xpath
         self.competitions_ul_xpath = competitions_ul_xpath
+        self.output_filepath = output_filepath
+        self.stats_url = stats_url
         self.current_page = 0
         self.current_competition = 0
         self.player_data = []
         self.webdriver = init_webdriver()
         self._accept_cookies()
+        self._get_season()
 
     def __del__(self):
         self.webdriver.quit()
@@ -47,6 +53,17 @@ class LaLigaScraper:
         logger.debug('Accepting cookies')
         accept_cookies_btn.click()
         time.sleep(1)
+
+    def _get_season(self):
+        logger.info('Getting season')
+        response = network.make_request(self.stats_url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        self.season = ''.join(re.search(r'(\d\d)/(\d\d)', soup.find('h1').text).groups())
+
+    @property
+    def seasoned_output_filepath(self):
+        new_file_stem = f'S{self.season}-{self.output_filepath.stem}'
+        return self.output_filepath.with_stem(new_file_stem)
 
     def _load_next_players_table(self):
         paginator = self.webdriver.find_element_by_xpath(self.paginator_xpath)
@@ -114,6 +131,6 @@ class LaLigaScraper:
         logger.info('Wrangling player dataframe')
         self.df = wrangle_dataframe(self.df)
 
-    def to_csv(self, output_filepath=settings.DF_OUTPUT_FILEPATH):
-        logger.info(f'Dumping player dataframe to {output_filepath}')
-        self.df.to_csv(output_filepath, index=False)
+    def to_csv(self):
+        logger.info(f'Dumping player dataframe to {self.seasoned_output_filepath}')
+        self.df.to_csv(self.seasoned_output_filepath, index=False)

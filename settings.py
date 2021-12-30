@@ -5,8 +5,9 @@ from prettyconf import config
 PROJECT_DIR = Path(__file__).resolve().parent
 PROJECT_NAME = PROJECT_DIR.name
 
-LALIGA_DATA_URL = config(
-    'LALIGA_DATA_URL', default='https://www.laliga.com/en-ES/advanced-stats'
+LALIGA_STATS_URL = config('LALIGA_STATS_URL', default='https://www.laliga.com/en-ES/stats')
+LALIGA_ADV_STATS_URL = config(
+    'LALIGA_ADV_STATS_URL', default='https://www.laliga.com/en-ES/advanced-stats'
 )
 
 SELENIUM_HEADLESS = config('SELENIUM_HEADLESS', default=True, cast=lambda v: bool(int(v)))
@@ -25,8 +26,9 @@ COMPETITIONS_UL_XPATH = config(
 SCRIPT_DATA_ID = config('SCRIPT_DATA_ID', default='__NEXT_DATA__')
 DROPDOWN_OFFSET = config('DROPDOWN_OFFSET', default=30, cast=int)
 
-DF_OUTPUT_FILEPATH = config(
-    'DF_OUTPUT_FILEPATH', default=PROJECT_DIR / (PROJECT_NAME + '.csv'), cast=Path
+DATASETS_FOLDER = config('DATASETS_FOLDER', default=PROJECT_DIR / 'datasets', cast=Path)
+PLAYERS_FILEPATH = config(
+    'PLAYERS_FILEPATH', default=DATASETS_FOLDER / 'laliga-players.csv', cast=Path
 )
 
 COMPETITION_COLUMN = config('COMPETITION_COLUMN', default='competition')

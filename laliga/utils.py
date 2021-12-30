@@ -44,7 +44,7 @@ def init_webdriver(headless=settings.SELENIUM_HEADLESS):
     )
 
 
-def build_url(path, base_url=settings.LALIGA_DATA_URL):
+def build_url(path, base_url=settings.LALIGA_ADV_STATS_URL):
     return urljoin(base_url, path)
 
 
