@@ -18,6 +18,13 @@ $ pip install -r requirements.txt
 
 Optionally, you can create a `.env` file in the working directory to overwrite settings from [settings.py](settings.py).
 
+### Other requirements
+
+There are few external requirements for the project to work properly:
+
+- [geckodriver](https://github.com/mozilla/geckodriver/releases)
+- [Firefox Browser](https://www.mozilla.org/firefox/download/)
+
 ## Usage
 
 ```console
