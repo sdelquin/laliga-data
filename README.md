@@ -47,4 +47,5 @@ Once finished, a **csv file** will be present in repo containing all scraped dat
 
 - Generated datasets are stored in the [datasets](datasets) folder and **updated weekly**.
 - Files will have a name like `S2122-laliga-players.csv` depending on the football season.
-- A description of the columns are also available in [col-specs.csv](datasets/col-specs.csv).
+- A description of the columns can be found in [col-specs.csv](datasets/col-specs.csv).
+- Datasets are also available at [Kaggle](https://www.kaggle.com/sdelquin/laliga-data).
