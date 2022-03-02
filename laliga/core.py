@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 
 import pandas as pd
@@ -107,6 +108,8 @@ class LaLigaScraper:
 
     def get_player_data_by_competition(self, competition: str, num_players=0):
         logger.info('Getting player data')
+        self.webdriver.save_screenshot('page.png')
+        sys.exit()
         num_checked_players = 1
         for player_url in self.get_player_urls():
             logger.debug(f'[{num_checked_players:03d}] {player_url}')
