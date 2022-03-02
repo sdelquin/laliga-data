@@ -57,13 +57,13 @@ def selenium_wait(
             response = WebDriverWait(driver, timeout=timeout).until(until)
         except TimeoutException as err:
             # This exception does not include any message
-            logger.error('TimeoutException by Selenium' + err)
+            logger.error('TimeoutException by Selenium')
+            if retry >= num_retries:
+                raise err
         else:
             return response
         logger.debug(f'Request delay: {req_delay} seconds')
         time.sleep(req_delay)
-        if retry >= num_retries:
-            break
         retry += 1
         logger.debug(f'Network retry {retry}')
         driver.refresh()

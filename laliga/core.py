@@ -1,10 +1,10 @@
 import re
-import sys
 import time
 
 import pandas as pd
 from bs4 import BeautifulSoup
 from logzero import logger
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -23,6 +23,7 @@ class LaLigaScraper:
         self,
         url=settings.LALIGA_ADV_STATS_URL,
         paginator_xpath=settings.PAGINATOR_XPATH,
+        paginator_top=settings.PAGINATOR_TOP,
         competitions_div_xpath=settings.COMPETITIONS_DIV_XPATH,
         competitions_ul_xpath=settings.COMPETITIONS_UL_XPATH,
         output_filepath=settings.PLAYERS_FILEPATH,
@@ -30,6 +31,7 @@ class LaLigaScraper:
     ):
         self.url = url
         self.paginator_xpath = paginator_xpath
+        self.paginator_top = paginator_top
         self.competitions_div_xpath = competitions_div_xpath
         self.competitions_ul_xpath = competitions_ul_xpath
         self.output_filepath = output_filepath
@@ -38,22 +40,38 @@ class LaLigaScraper:
         self.current_competition = 0
         self.player_data = []
         self.webdriver = init_webdriver()
+
+        logger.info(f'Moving to {self.url}')
+        self.webdriver.get(self.url)
+
         self._accept_cookies()
+        self._close_advertisement()
         self._get_season()
 
     def __del__(self):
         self.webdriver.quit()
 
     def _accept_cookies(self):
-        logger.info(f'Moving to {self.url}')
-        self.webdriver.get(self.url)
+        logger.debug('Accepting cookies')
         accept_cookies_btn = network.selenium_wait(
             self.webdriver,
             EC.presence_of_element_located((By.ID, 'onetrust-accept-btn-handler')),
         )
-        logger.debug('Accepting cookies')
         accept_cookies_btn.click()
         time.sleep(1)
+
+    def _close_advertisement(self):
+        logger.debug('Closing advertisement')
+        try:
+            adv_button = network.selenium_wait(
+                self.webdriver,
+                EC.element_to_be_clickable((By.CLASS_NAME, 'rctfl-close')),
+                num_retries=0,
+            )
+            adv_button.click()
+            time.sleep(1)
+        except TimeoutException:
+            logger.warning('No advertisements found')
 
     def _get_season(self):
         logger.info('Getting season')
@@ -66,12 +84,21 @@ class LaLigaScraper:
         new_file_stem = f'S{self.season}-{self.output_filepath.stem}'
         return self.output_filepath.with_stem(new_file_stem)
 
+    def _scroll_to_paginator(self):
+        js_code = f"window.scrollTo({{'top': {self.paginator_top}}})"
+        self.webdriver.execute_script(js_code)
+        time.sleep(1)
+
     def _load_next_players_table(self):
-        paginator = self.webdriver.find_element_by_xpath(self.paginator_xpath)
+        paginator = network.selenium_wait(
+            self.webdriver,
+            EC.element_to_be_clickable((By.XPATH, self.paginator_xpath)),
+        )
         for div in paginator.find_elements_by_tag_name('div'):
             page = div.text.strip()
             if page.isnumeric():
                 if int(page) == self.current_page + 1:
+                    self._scroll_to_paginator()
                     div.click()
                     table = network.selenium_wait(
                         self.webdriver,
@@ -108,8 +135,6 @@ class LaLigaScraper:
 
     def get_player_data_by_competition(self, competition: str, num_players=0):
         logger.info('Getting player data')
-        self.webdriver.save_screenshot('page.png')
-        sys.exit()
         num_checked_players = 1
         for player_url in self.get_player_urls():
             logger.debug(f'[{num_checked_players:03d}] {player_url}')

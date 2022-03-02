@@ -5,9 +5,13 @@ from prettyconf import config
 PROJECT_DIR = Path(__file__).resolve().parent
 PROJECT_NAME = PROJECT_DIR.name
 
-LALIGA_STATS_URL = config('LALIGA_STATS_URL', default='https://www.laliga.com/en-ES/stats')
+LALIGA_LANGCODE = config('LALIGA_LANGCODE', default='en-ES')
+LALIGA_STATS_URL = config(
+    'LALIGA_STATS_URL', default=f'https://www.laliga.com/{LALIGA_LANGCODE}/stats'
+)
 LALIGA_ADV_STATS_URL = config(
-    'LALIGA_ADV_STATS_URL', default='https://www.laliga.com/en-ES/advanced-stats'
+    'LALIGA_ADV_STATS_URL',
+    default=f'https://www.laliga.com/{LALIGA_LANGCODE}/advanced-stats',
 )
 
 SELENIUM_HEADLESS = config('SELENIUM_HEADLESS', default=True, cast=lambda v: bool(int(v)))
@@ -15,6 +19,7 @@ SELENIUM_HEADLESS = config('SELENIUM_HEADLESS', default=True, cast=lambda v: boo
 PAGINATOR_XPATH = config(
     'PAGINATOR_XPATH', default='//*[@id="__next"]/div[5]/div[4]/div/div/div'
 )
+PAGINATOR_TOP = config('PAGINATOR_TOP', default=1500, cast=int)
 COMPETITIONS_DIV_XPATH = config(
     'COMPETITIONS_DIV_XPATH',
     default='//*[@id="__next"]/div[5]/div[1]/div/div[2]/div/div[2]/div[1]/div',
@@ -47,7 +52,6 @@ SELENIUM_TIMEOUT = config('SELENIUM_TIMEOUT', default=30, cast=int)  # seconds
 SELENIUM_DELAY = config('SELENIUM_DELAY', default=1, cast=int)  # seconds
 SELENIUM_RETRIES = config('SELENIUM_RETRIES', default=3, cast=int)
 
-ACCEPT_LANGUAGE = config('ACCEPT_LANGUAGE', default='es-ES')
 
 PLAYER_PROPS_SELECTION = {
     'id': ('player', 'id'),
