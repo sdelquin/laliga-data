@@ -35,10 +35,13 @@ def init_logger():
     return logzero.logger
 
 
-def init_webdriver(headless=settings.SELENIUM_HEADLESS):
+def init_webdriver(
+    headless=settings.SELENIUM_HEADLESS, accept_language=settings.ACCEPT_LANGUAGE
+):
     options = Options()
     options.headless = headless
     profile = webdriver.FirefoxProfile()
+    profile.set_preference('intl.accept_languages', accept_language)
     return webdriver.Firefox(
         options=options, firefox_profile=profile, service_log_path=os.devnull
     )

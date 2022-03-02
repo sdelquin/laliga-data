@@ -47,6 +47,8 @@ SELENIUM_TIMEOUT = config('SELENIUM_TIMEOUT', default=30, cast=int)  # seconds
 SELENIUM_DELAY = config('SELENIUM_DELAY', default=1, cast=int)  # seconds
 SELENIUM_RETRIES = config('SELENIUM_RETRIES', default=3, cast=int)
 
+ACCEPT_LANGUAGE = config('ACCEPT_LANGUAGE', default='es-ES')
+
 PLAYER_PROPS_SELECTION = {
     'id': ('player', 'id'),
     'slug': ('player', 'slug'),
