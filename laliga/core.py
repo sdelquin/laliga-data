@@ -7,7 +7,6 @@ from logzero import logger
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 
 import settings
@@ -85,6 +84,7 @@ class LaLigaScraper:
         return self.output_filepath.with_stem(new_file_stem)
 
     def _scroll_to_paginator(self):
+        logger.debug('Scrolling to paginator')
         js_code = f"window.scrollTo({{'top': {self.paginator_top}}})"
         self.webdriver.execute_script(js_code)
         time.sleep(1)
@@ -116,9 +116,9 @@ class LaLigaScraper:
                 yield build_url(tr.td.a['href'])
 
     def _load_next_competition(self):
-        self.webdriver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-        actions = ActionChains(self.webdriver)
         competitions_div = self.webdriver.find_element_by_xpath(self.competitions_div_xpath)
+        self.webdriver.execute_script('window.scrollTo(0, 0);')
+        time.sleep(1)
         competitions_div.click()
         competitions_ul = self.webdriver.find_element_by_xpath(self.competitions_ul_xpath)
         competitions = competitions_ul.find_elements_by_tag_name('li')
@@ -126,6 +126,7 @@ class LaLigaScraper:
             return None
         competition = competitions[self.current_competition]
         logger.info(f'Loading competition "{competition.text}"')
+        actions = ActionChains(self.webdriver)
         actions.move_to_element(competitions_div)
         actions.move_by_offset(0, (self.current_competition + 1) * settings.DROPDOWN_OFFSET)
         actions.click()
@@ -149,6 +150,7 @@ class LaLigaScraper:
 
     def get_player_data(self, num_players=0):
         while competition := self._load_next_competition():
+            time.sleep(10)
             self.get_player_data_by_competition(competition, num_players)
 
     def to_dataframe(self):
