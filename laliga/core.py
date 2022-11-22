@@ -150,6 +150,8 @@ class LaLigaScraper:
 
     def get_player_data(self, num_players=0):
         while competition := self._load_next_competition():
+            if competition in settings.SKIPPED_COMPETITIONS:
+                continue
             time.sleep(10)
             self.get_player_data_by_competition(competition, num_players)
 

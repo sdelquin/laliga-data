@@ -79,3 +79,7 @@ PLAYER_PROPS_SELECTION = {
     'stadium': ('club', 'venue', 'name'),
     'stadium.image': ('club', 'venue', 'image', 'resizes', 'medium'),
 }
+
+SKIPPED_COMPETITIONS = config(
+    'SKIPPED_COMPETITIONS', default='Mundial FIFA', cast=lambda v: v.split(',')
+)
