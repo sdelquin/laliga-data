@@ -7,7 +7,8 @@ PROJECT_NAME = PROJECT_DIR.name
 
 LALIGA_LANGCODE = config('LALIGA_LANGCODE', default='en-ES')
 LALIGA_STATS_URL = config(
-    'LALIGA_STATS_URL', default=f'https://www.laliga.com/{LALIGA_LANGCODE}/stats'
+    'LALIGA_STATS_URL',
+    default='https://www.laliga.com/en-ES/stats/laliga-santander/scorers',
 )
 LALIGA_ADV_STATS_URL = config(
     'LALIGA_ADV_STATS_URL',
