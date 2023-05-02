@@ -5,3 +5,4 @@ __pycache__
 *.log
 *.log.*
 prod-test.sh
+.python-version
