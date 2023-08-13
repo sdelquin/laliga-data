@@ -17,18 +17,16 @@ LALIGA_ADV_STATS_URL = config(
 
 SELENIUM_HEADLESS = config('SELENIUM_HEADLESS', default=True, cast=lambda v: bool(int(v)))
 
-PAGINATOR_XPATH = config(
-    'PAGINATOR_XPATH', default='//*[@id="__next"]/div[5]/div[4]/div/div/div'
-)
-PAGINATOR_TOP = config('PAGINATOR_TOP', default=1500, cast=int)
 COMPETITIONS_DIV_XPATH = config(
     'COMPETITIONS_DIV_XPATH',
-    default='//*[@id="__next"]/div[5]/div[1]/div/div[2]/div/div[2]/div[1]/div',
+    default='/html/body/div[1]/div[6]/div[1]/div/div[2]/div[3]/div[1]/div/div[1]',
 )
 COMPETITIONS_UL_XPATH = config(
     'COMPETITIONS_UL_XPATH',
-    default='//*[@id="__next"]/div[5]/div[1]/div/div[2]/div/div[2]/div[1]/ul',
+    default='/html/body/div[1]/div[6]/div[1]/div/div[2]/div[3]/div[1]/ul',
 )
+PAGINATOR_XPATH = config('PAGINATOR_XPATH', default='/html/body/div[1]/div[6]/div[4]/div/div/div')
+PAGINATOR_TOP = config('PAGINATOR_TOP', default=1500, cast=int)
 SCRIPT_DATA_ID = config('SCRIPT_DATA_ID', default='__NEXT_DATA__')
 DROPDOWN_OFFSET = config('DROPDOWN_OFFSET', default=30, cast=int)
 

@@ -44,7 +44,6 @@ class LaLigaScraper:
         self.webdriver.get(self.url)
 
         self._accept_cookies()
-        self._close_advertisement()
         self._get_season()
 
     def __del__(self):
@@ -124,15 +123,15 @@ class LaLigaScraper:
         competitions = competitions_ul.find_elements_by_tag_name('li')
         if self.current_competition >= len(competitions):
             return None
-        competition = competitions[self.current_competition]
-        logger.info(f'Loading competition "{competition.text}"')
+        competition_name = competitions[self.current_competition].text
+        logger.info(f'Loading competition "{competition_name}"')
         actions = ActionChains(self.webdriver)
         actions.move_to_element(competitions_div)
         actions.move_by_offset(0, (self.current_competition + 1) * settings.DROPDOWN_OFFSET)
         actions.click()
         actions.perform()
         self.current_competition += 1
-        return competition.text
+        return competition_name
 
     def get_player_data_by_competition(self, competition: str, num_players=0):
         logger.info('Getting player data')
